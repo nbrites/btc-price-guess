@@ -30,6 +30,10 @@ jobs:
           cd frontend
           npm run test --verbose
 
+      - name: Set environment variables
+        run: |
+          echo "REACT_APP_BTC_PRICE_URL=${{ secrets.REACT_APP_BTC_PRICE_URL }}" >> $GITHUB_ENV
+
       - name: Build frontend
         run: |
           cd frontend
