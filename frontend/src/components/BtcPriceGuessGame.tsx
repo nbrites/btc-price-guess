@@ -15,7 +15,6 @@ export enum GuessDirection {
 }
 
 export enum ErrorMessages {
-  ERROR_FETCHING_INITAL_SCORE = "Error fetching initial score.",
   FAILED_TO_UPDATE_SCORE = "Failed to update the score on the backend.",
 }
 
@@ -24,7 +23,7 @@ const BtcPriceGuessGame: React.FC = () => {
   const { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess } = useBTCPrice();
   const [finalPrice, setFinalPrice] = useState<number | null>(null);
   const userId = useUserId();
-  const { score, loading, error } = useScore(userId);
+  const { score, loading, error, upsertScore } = useScore(userId);  // Get upsertScore from hook
   const [guess, setGuess] = useState<GuessDirection | null>(null);
   const [isGameActive, setGameActive] = useState(false);
 
@@ -64,10 +63,8 @@ const BtcPriceGuessGame: React.FC = () => {
     let newScore;
     if (isCorrectGuess()) {
       newScore = score + 1;
-      console.log('Win')
     } else {
       newScore = Math.max(score - 1, 0);
-      console.log('Loss')
     }
 
     setGameActive(false);
@@ -75,12 +72,12 @@ const BtcPriceGuessGame: React.FC = () => {
 
     try {
       if (newScore !== score) {
-        console.log("Upsert score now")
+        await upsertScore(newScore);
       }
-    } catch {
+    } catch (error) {
       console.log(ErrorMessages.FAILED_TO_UPDATE_SCORE);
     }
-  }, [isCorrectGuess, score, price]);
+  }, [isCorrectGuess, score, price, upsertScore]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
