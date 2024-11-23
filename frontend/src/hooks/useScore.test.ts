@@ -142,7 +142,7 @@ describe("useScore", () => {
     });
 
     expect(result.current.score).toBe(mockScore);
-    expect(result.current.error).toBe("Failed to update the score");
+    expect(result.current.error).toBe("Failed to upsert the score");
 
     expect(fetch).toHaveBeenCalledWith(
       `${process.env.REACT_APP_API_BASE_URL || ""}/scores`,

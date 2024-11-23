@@ -52,7 +52,7 @@ const useScore = (userId: string | null) => {
         }
         setScore(newScore);
       } catch (err) {
-        setError("Failed to update the score");
+        setError("Failed to upsert the score");
       }
     },
     [userId]

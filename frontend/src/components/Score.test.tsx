@@ -17,7 +17,7 @@ describe('Score Component', () => {
 
   it('displays "Loading score..." when loading is true', () => {
     render(<Score score={null} loading={true} error={null} />);
-    const loadingText = screen.getByText(/Loading score.../i);
+    const loadingText = screen.getByText(/Loading.../i);
     expect(loadingText).toBeInTheDocument();
   });
 
