@@ -6,13 +6,14 @@ const app = express();
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? "https://dnk5qap6lmzyn.cloudfront.net/"
+    ? "https://dnk5qap6lmzyn.cloudfront.net"
     : "http://localhost:3000";
 
-app.use(
+app.options(
+  "*",
   cors({
     origin: allowedOrigins,
-    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    methods: "GET,POST,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
   })
