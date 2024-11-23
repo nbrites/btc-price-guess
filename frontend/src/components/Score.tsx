@@ -16,7 +16,7 @@ const Score: React.FC<ScoreProps> = ({ score, loading, error }) => {
           <p className="text-red-500">Error: {error}</p>
         ) : (
           <>
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">Score</h3>
+            <h3 className="text-lg font-semibold text-gray-600 mb-2">Score 🎯</h3>
             <p
               className="text-3xl font-bold text-gray-500"
               aria-label={`Current score is ${score}`}
