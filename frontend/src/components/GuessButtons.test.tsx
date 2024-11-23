@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import GuessButtons from './GuessButtons';
-import { GuessDirection } from './BtcPriceGuessGame';
+import { GuessDirection } from "../enums/GuessDirection.enum"
 
 describe('GuessButtons Component', () => {
   const onGuessMock = jest.fn();

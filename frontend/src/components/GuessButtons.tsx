@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import { GuessDirection } from './BtcPriceGuessGame';
+import { GuessDirection } from "../enums/GuessDirection.enum"
 
 interface GuessButtonsProps {
   onGuess: (guess: GuessDirection) => void;

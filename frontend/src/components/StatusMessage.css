@@ -1,0 +1,34 @@
+.status-message-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+  padding: 0 15px;
+}
+
+.status-message {
+  background-color: #2d3748;
+  color: #edf2f7;
+  padding: 16px 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  font-size: 1.0rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.status-message p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .status-message {
+    font-size: 1rem;
+    padding: 12px 20px;
+  }
+}

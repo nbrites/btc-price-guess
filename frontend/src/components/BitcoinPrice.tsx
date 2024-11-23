@@ -4,9 +4,10 @@ interface BitcoinPriceProps {
   currentPrice: number | null;
   guessPrice: number | null;
   finalPrice: number | null;
+  remainingTime: number;
 }
 
-const BitcoinPrice: React.FC<BitcoinPriceProps> = ({ guessPrice, currentPrice, finalPrice }) => {
+const BitcoinPrice: React.FC<BitcoinPriceProps> = ({ guessPrice, currentPrice, finalPrice, remainingTime }) => {
   return (
     <div className="text-center mt-8">
       <div className="flex items-center justify-center space-x-10">
@@ -25,7 +26,7 @@ const BitcoinPrice: React.FC<BitcoinPriceProps> = ({ guessPrice, currentPrice, f
         <div className="bg-white p-6 rounded-xl shadow-lg w-56 opacity-90">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Final Price 🏁</h3>
           <div className="text-3xl font-bold text-gray-900">
-            {finalPrice !== null ? `$${finalPrice.toFixed(2)}` : '?'}
+            {finalPrice !== null ? `$${finalPrice.toFixed(2)}` : `⏳ ${remainingTime}s`}
           </div>
         </div>
       </div>
