@@ -12,12 +12,11 @@ const allowedOrigins =
     ? "https://dnk5qap6lmzyn.cloudfront.net"
     : "http://localhost:3000";
 
-app.options(
-  "*",
+app.use(
   cors({
     origin: allowedOrigins,
-    methods: "GET,POST,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
+    methods: "GET, POST, OPTIONS",
+    allowedHeaders: "Content-Type, Authorization",
     credentials: true,
   })
 );
@@ -26,11 +25,6 @@ app.use(express.json());
 
 app.get("/scores/:userId", getScoreHandler);
 app.post("/scores", upsertScoreHandler);
-
-const PORT = process.env.PORT || 8081;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
 
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
