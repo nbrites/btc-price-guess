@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  NodeEnv:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - production
+    Description: The environment for the application (e.g., development, production)
+  DynamoDbEndpoint:
+    Type: String
+    Default: http://dynamodb:8000
+    Description: The DynamoDb endpoint
+
+Resources:
+  ExpressAppApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ExpressAppApi
+      StageName: Prod
+
+  ExpressAppRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+      Policies:
+        - PolicyName: LambdaDynamoDBAndLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource: !GetAtt ScoreTable.Arn
+
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*
+
+  ExpressApp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/lambda.handler
+      Runtime: nodejs18.x
+      MemorySize: 512
+      Timeout: 10
+      Role: !GetAtt ExpressAppRole.Arn
+      Environment:
+        Variables:
+          NODE_ENV: !Ref NodeEnv
+          DYNAMODB_ENDPOINT: !Ref DynamoDbEndpoint
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ExpressAppApi
+            Path: /{proxy+}
+            Method: any
+
+  ScoreTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ScoreTable
+      AttributeDefinitions:
+        - AttributeName: "userId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "userId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${ExpressAppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  NodeEnvEnvVar:
+    Description: "The application environment (NODE_ENV)"
+    Value: !Ref NodeEnv
+  DynamoDbEndpointEnvVar:
+    Description: "The DynamoDb endpoint"
+    Value: !Ref DynamoDbEndpoint
