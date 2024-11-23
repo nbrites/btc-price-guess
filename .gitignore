@@ -27,3 +27,4 @@ yarn-error.log*
 # api
 .aws-sam
 dist
+coverage

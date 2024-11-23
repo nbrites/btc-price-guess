@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
-import { getScoreHandler } from "./controllers/scoreController";
+import {
+  getScoreHandler,
+  upsertScoreHandler,
+} from "./controllers/scoreController";
 
 const app = express();
 
@@ -22,6 +25,12 @@ app.options(
 app.use(express.json());
 
 app.get("/scores/:userId", getScoreHandler);
+app.post("/scores", upsertScoreHandler);
+
+const PORT = process.env.PORT || 8081;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
