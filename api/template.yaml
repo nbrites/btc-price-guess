@@ -98,3 +98,4 @@ Outputs:
   DynamoDbEndpointEnvVar:
     Description: "The DynamoDb endpoint"
     Value: !Ref DynamoDbEndpoint
+    
