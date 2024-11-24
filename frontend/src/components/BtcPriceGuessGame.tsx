@@ -1,35 +1,36 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useTimer } from 'react-timer-hook';
 
-
 import Header from "./Header";
 import BitcoinPrice from "./BitcoinPrice";
 import Score from "./Score";
-import StatusMessage from "./StatusMessage"
+import StatusMessage from "./StatusMessage";
 import useBTCPrice from "../hooks/useBTCPrice";
 import useScore from "../hooks/useScore";
 import useUserId from "../hooks/useUserId";
 import GuessButtons from "./GuessButtons";
-import { GuessDirection } from "../enums/GuessDirection.enum"
-import { BtcGuessGameMessages } from "../enums/GuessGameMessages.enum"
+import { GuessDirection } from "../enums/GuessDirection.enum";
+import { BtcGuessGameMessages } from "../enums/GuessGameMessages.enum";
 
-export enum ErrorMessages {
+enum ErrorMessages {
   FAILED_TO_UPDATE_SCORE = "Failed to update the score on the backend.",
 }
 
 const BtcPriceGuessGame: React.FC = () => {
-  const gameDurationSeconds = 20;
-  const { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess } = useBTCPrice();
-  const [finalPrice, setFinalPrice] = useState<number | null>(null);
+  const gameDurationMilliseconds = Number(process.env.REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS) || 60000;
+
+  const { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess, finalPrice, setFinalPrice } = useBTCPrice();
   const userId = useUserId();
-  const { score, loading, error, upsertScore } = useScore(userId);  // Get upsertScore from hook
+  const { score, loading, error, upsertScore } = useScore(userId);
   const [guess, setGuess] = useState<GuessDirection | null>(null);
   const [isGameActive, setGameActive] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(BtcGuessGameMessages.WAITING_FOR_GUESS);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
 
-  const { seconds, start, restart } = useTimer({
-    expiryTimestamp: new Date(new Date().getTime() + gameDurationSeconds * 1000),
+  const expiryTimestamp = new Date(new Date().getTime() + gameDurationMilliseconds);
+
+  const { minutes, seconds, restart } = useTimer({
+    expiryTimestamp,
     autoStart: false,
     onExpire: () => {
       if (isGameActive) {
@@ -46,11 +47,8 @@ const BtcPriceGuessGame: React.FC = () => {
     setFinalPrice(null);
     setResultMessage(null);
 
-    if (seconds === gameDurationSeconds) {
-      start();
-    } else {
-      restart(new Date(new Date().getTime() + gameDurationSeconds * 1000));
-    }
+    const newExpiryTimestamp = new Date(new Date().getTime() + gameDurationMilliseconds);
+    restart(newExpiryTimestamp);
   };
 
   const isCorrectGuess = useCallback((): boolean => {
@@ -86,7 +84,7 @@ const BtcPriceGuessGame: React.FC = () => {
         await upsertScore(newScore);
       }
     } catch (error) {
-      console.log(ErrorMessages.FAILED_TO_UPDATE_SCORE);
+      console.error(ErrorMessages.FAILED_TO_UPDATE_SCORE);
     }
   }, [isCorrectGuess, score, price, upsertScore]);
 
@@ -116,13 +114,12 @@ const BtcPriceGuessGame: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
       <Header />
       <div className="flex flex-row space-x-10 mt-6">
-        <BitcoinPrice guessPrice={priceAtTimeOfGuess} currentPrice={price} finalPrice={finalPrice} remainingTime={seconds} />
+        <BitcoinPrice guessPrice={priceAtTimeOfGuess} currentPrice={price} finalPrice={finalPrice} />
         <Score score={score} loading={loading} error={error} />
       </div>
       <div className="mt-4 w-full">
-        <StatusMessage status={resultMessage || statusMessage} />
+        <StatusMessage status={resultMessage || statusMessage} remainingTime={minutes * 60 + seconds} />
       </div>
-
       <GuessButtons onGuess={handleGuess} isDisabled={isGameActive} guess={guess} />
     </div>
   );

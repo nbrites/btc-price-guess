@@ -10,6 +10,7 @@ const useBTCPrice = () => {
   const [priceAtTimeOfGuess, setPriceAtTimeOfGuess] = useState<number | null>(
     null
   );
+  const [finalPrice, setFinalPrice] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBTCPrice = async () => {
@@ -40,7 +41,14 @@ const useBTCPrice = () => {
     return () => clearInterval(interval);
   }, []);
 
-  return { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess, error };
+  return {
+    price,
+    priceAtTimeOfGuess,
+    setPriceAtTimeOfGuess,
+    finalPrice,
+    setFinalPrice,
+    error,
+  };
 };
 
 export default useBTCPrice;

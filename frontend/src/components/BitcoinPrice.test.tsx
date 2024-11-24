@@ -6,14 +6,13 @@ describe('BitcoinPrice Component', () => {
     const currentPrice = 50000;
     const guessPrice = 48000;
     const finalPrice = 49000;
-    const remainingTime = 30;
 
     render(
       <BitcoinPrice
         currentPrice={currentPrice}
         guessPrice={guessPrice}
         finalPrice={finalPrice}
-        remainingTime={remainingTime}
+
       />
     );
 
@@ -26,14 +25,13 @@ describe('BitcoinPrice Component', () => {
     const currentPrice = null;
     const guessPrice = 48000;
     const finalPrice = 49000;
-    const remainingTime = 30;
 
     render(
       <BitcoinPrice
         currentPrice={currentPrice}
         guessPrice={guessPrice}
         finalPrice={finalPrice}
-        remainingTime={remainingTime}
+
       />
     );
 
@@ -44,35 +42,31 @@ describe('BitcoinPrice Component', () => {
     const currentPrice = 50000;
     const guessPrice = null;
     const finalPrice = 49000;
-    const remainingTime = 30;
 
     render(
       <BitcoinPrice
         currentPrice={currentPrice}
         guessPrice={guessPrice}
         finalPrice={finalPrice}
-        remainingTime={remainingTime}
       />
     );
 
     expect(screen.getByText('-')).toBeInTheDocument();
   });
 
-  test('should display remaining time when finalPrice is null', () => {
+  test('should display "?" when finalPrice is null', () => {
     const currentPrice = 50000;
     const guessPrice = 48000;
     const finalPrice = null;
-    const remainingTime = 30;
 
     render(
       <BitcoinPrice
         currentPrice={currentPrice}
         guessPrice={guessPrice}
         finalPrice={finalPrice}
-        remainingTime={remainingTime}
       />
     );
 
-    expect(screen.getByText('⏳ 30s')).toBeInTheDocument();
+    expect(screen.getByText('?')).toBeInTheDocument();
   });
 });

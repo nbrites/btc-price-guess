@@ -34,6 +34,7 @@ jobs:
         run: |
           echo "REACT_APP_BTC_PRICE_URL=${{ secrets.REACT_APP_BTC_PRICE_URL }}" >> $GITHUB_ENV
           echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" >> $GITHUB_ENV
+          echo "REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS=${{ vars.REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS }}" >> $GITHUB_ENV
 
       - name: Build frontend
         run: |

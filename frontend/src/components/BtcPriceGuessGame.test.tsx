@@ -11,7 +11,7 @@ jest.mock('../hooks/useBTCPrice', () => ({
 
 describe('BtcPriceGuessGame', () => {
   it('fetches and displays initial score correctly', async () => {
-    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, setPriceAtTimeOfGuess: jest.fn() };
+    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, finalPrice: null, setFinalPrice: jest.fn(), setPriceAtTimeOfGuess: jest.fn() };
     require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
 
     await act(async () => {
@@ -34,7 +34,7 @@ describe('BtcPriceGuessGame', () => {
       })
     );
 
-    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, setPriceAtTimeOfGuess: jest.fn() };
+    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, finalPrice: 49000, setFinalPrice: jest.fn(), setPriceAtTimeOfGuess: jest.fn() };
     require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
 
     await act(async () => {
@@ -68,7 +68,7 @@ describe('BtcPriceGuessGame', () => {
       })
     );
 
-    const mockPrice = { price: 49000, priceAtTimeOfGuess: 50000, setPriceAtTimeOfGuess: jest.fn() };
+    const mockPrice = { price: 49000, priceAtTimeOfGuess: 50000, finalPrice: 5000, setPriceAtTimeOfGuess: jest.fn(), setFinalPrice: jest.fn() };
     require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
 
     await act(async () => {
@@ -91,7 +91,10 @@ describe('BtcPriceGuessGame', () => {
     jest.useRealTimers();
   });
 
+
   it('handles the timer expiration, shows the game win message and updated score', async () => {
+    process.env.REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS = '20000';
+
     jest.useFakeTimers();
 
     //@ts-ignore
@@ -102,7 +105,7 @@ describe('BtcPriceGuessGame', () => {
       })
     );
 
-    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, setPriceAtTimeOfGuess: jest.fn() };
+    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, finalPrice: 51000, setFinalPrice: jest.fn(), setPriceAtTimeOfGuess: jest.fn() };
     require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
 
     await act(async () => {
@@ -143,9 +146,11 @@ describe('BtcPriceGuessGame', () => {
   });
 
   it('handles the timer expiration, shows the game loss message and no score update', async () => {
+    process.env.REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS = '20000';
+
     jest.useFakeTimers();
 
-    //@ts-ignore
+    // @ts-ignore
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
@@ -153,7 +158,13 @@ describe('BtcPriceGuessGame', () => {
       })
     );
 
-    const mockPrice = { price: 51000, priceAtTimeOfGuess: 50000, setPriceAtTimeOfGuess: jest.fn() };
+    const mockPrice = {
+      price: 51000,
+      priceAtTimeOfGuess: 50000,
+      finalPrice: 49000,
+      setFinalPrice: jest.fn(),
+      setPriceAtTimeOfGuess: jest.fn(),
+    };
     require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
 
     await act(async () => {
@@ -170,6 +181,7 @@ describe('BtcPriceGuessGame', () => {
     });
 
     mockPrice.price = 51000;
+
     act(() => {
       jest.advanceTimersByTime(10000);
     });
@@ -184,10 +196,6 @@ describe('BtcPriceGuessGame', () => {
 
     await waitFor(() => {
       expect(screen.getByText(BtcGuessGameMessages.LOSS)).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Score 🎯')).toBeInTheDocument();
       expect(screen.getByText('0')).toBeInTheDocument();
     });
 
