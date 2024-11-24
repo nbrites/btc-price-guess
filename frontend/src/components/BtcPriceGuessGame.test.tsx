@@ -201,4 +201,60 @@ describe('BtcPriceGuessGame', () => {
 
     jest.useRealTimers();
   });
+
+  it('handles a draw scenario where the guessed price is equal to the final price', async () => {
+    jest.useFakeTimers();
+
+    //@ts-ignore
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ ok: true, data: { amount: '50000' } }),
+      })
+    );
+
+    const mockPrice = {
+      price: 51000,
+      priceAtTimeOfGuess: 50000,
+      finalPrice: 50000,
+      setFinalPrice: jest.fn(),
+      setPriceAtTimeOfGuess: jest.fn(),
+    };
+    require('../hooks/useBTCPrice').default.mockReturnValue(mockPrice);
+
+    await act(async () => {
+      render(<BtcPriceGuessGame />);
+    });
+
+    await waitFor(() => {
+      const priceElements = screen.getAllByText('$50000.00');
+      expect(priceElements[0]).toBeInTheDocument(); // for "Guess Price"
+      expect(priceElements[1]).toBeInTheDocument(); // for "Final Price"
+    });
+
+    const upButton = screen.getByRole('button', { name: /guess up/i });
+    act(() => {
+      fireEvent.click(upButton);
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/The price ended where it started, no win or loss/)).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Score 🎯')).toBeInTheDocument();
+      expect(screen.getByText('0')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Congratulations! You've guessed correctly/)).not.toBeInTheDocument();
+    });
+
+    jest.useRealTimers();
+  });
+
 });

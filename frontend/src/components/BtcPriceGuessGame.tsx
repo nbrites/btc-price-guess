@@ -67,17 +67,20 @@ const BtcPriceGuessGame: React.FC = () => {
   }, [price, priceAtTimeOfGuess, guess]);
 
   const handleGameResult = useCallback(async () => {
+    setGameActive(false);
+    setFinalPrice(price);
     let newScore;
-    if (isCorrectGuess()) {
+
+    if (priceAtTimeOfGuess === finalPrice) {
+      newScore = score;
+      setResultMessage(BtcGuessGameMessages.DRAW);
+    } else if (isCorrectGuess()) {
       newScore = score + 1;
       setResultMessage(BtcGuessGameMessages.WIN);
     } else {
       newScore = Math.max(score - 1, 0);
       setResultMessage(BtcGuessGameMessages.LOSS);
     }
-
-    setGameActive(false);
-    setFinalPrice(price);
 
     try {
       if (newScore !== score) {
@@ -86,7 +89,7 @@ const BtcPriceGuessGame: React.FC = () => {
     } catch (error) {
       console.error(ErrorMessages.FAILED_TO_UPDATE_SCORE);
     }
-  }, [isCorrectGuess, score, price, upsertScore]);
+  }, [isCorrectGuess, score, price, priceAtTimeOfGuess, finalPrice, setFinalPrice, upsertScore]);
 
   const updateStatusBasedOnPrice = useCallback(() => {
     if (price === null || priceAtTimeOfGuess === null || guess === null) {
@@ -101,7 +104,8 @@ const BtcPriceGuessGame: React.FC = () => {
       return isCorrectGuess() ? BtcGuessGameMessages.GUESS_ON_TRACK : BtcGuessGameMessages.GUESS_OFF_TRACK;
     };
 
-    setStatusMessage(getStatusMessage());
+    const status = getStatusMessage();
+    setStatusMessage(status);
   }, [price, priceAtTimeOfGuess, guess, isCorrectGuess]);
 
   useEffect(() => {
