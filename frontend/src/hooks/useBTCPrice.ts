@@ -12,9 +12,11 @@ const useBTCPrice = () => {
   );
   const [finalPrice, setFinalPrice] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchBTCPrice = async () => {
     try {
+      setLoading(true);
       const response = await fetch(API_BASE_URL, {
         method: "GET",
         headers: {
@@ -29,8 +31,11 @@ const useBTCPrice = () => {
       const { data } = await response.json();
       const btcPrice = parseFloat(data.amount);
       setPrice(btcPrice);
+      setError(null);
     } catch (err: any) {
       setError(err.message || "Failed to fetch Bitcoin price");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,6 +53,7 @@ const useBTCPrice = () => {
     finalPrice,
     setFinalPrice,
     error,
+    loading,
   };
 };
 

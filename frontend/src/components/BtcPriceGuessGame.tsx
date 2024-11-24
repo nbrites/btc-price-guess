@@ -19,9 +19,9 @@ enum ErrorMessages {
 const BtcPriceGuessGame: React.FC = () => {
   const gameDurationMilliseconds = Number(process.env.REACT_APP_BTC_GUESS_GAME_DURATION_MILLISECONDS) || 60000;
 
-  const { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess, finalPrice, setFinalPrice } = useBTCPrice();
+  const { price, priceAtTimeOfGuess, setPriceAtTimeOfGuess, finalPrice, setFinalPrice, loading: btcPriceLoading, error: btcPriceError } = useBTCPrice();
   const userId = useUserId();
-  const { score, loading, error, upsertScore } = useScore(userId);
+  const { score, loading: scoreLoading, error: scoreError, upsertScore } = useScore(userId);
   const [guess, setGuess] = useState<GuessDirection | null>(null);
   const [isGameActive, setGameActive] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(BtcGuessGameMessages.WAITING_FOR_GUESS);
@@ -118,8 +118,13 @@ const BtcPriceGuessGame: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
       <Header />
       <div className="flex flex-row space-x-10 mt-6">
-        <BitcoinPrice guessPrice={priceAtTimeOfGuess} currentPrice={price} finalPrice={finalPrice} />
-        <Score score={score} loading={loading} error={error} />
+        <BitcoinPrice
+          guessPrice={priceAtTimeOfGuess}
+          currentPrice={price}
+          finalPrice={finalPrice}
+          loading={btcPriceLoading}
+          error={btcPriceError} />
+        <Score score={score} loading={scoreLoading} error={scoreError} />
       </div>
       <div className="mt-4 w-full">
         <StatusMessage status={resultMessage || statusMessage} remainingTime={minutes * 60 + seconds} />

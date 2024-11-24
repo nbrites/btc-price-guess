@@ -36,6 +36,7 @@ describe("useBTCPrice", () => {
       }
     );
     expect(result.current.error).toBe(null);
+    expect(result.current.loading).toBe(false);
   });
 
   it("should handle fetch errors gracefully", async () => {
@@ -50,6 +51,7 @@ describe("useBTCPrice", () => {
     });
 
     expect(result.current.price).toBe(null);
+    expect(result.current.loading).toBe(false);
   });
 
   it("should update `priceAtTimeOfGuess` when setPriceAtTimeOfGuess is called", () => {
@@ -65,7 +67,7 @@ describe("useBTCPrice", () => {
   it("should keep updating the price at the refresh interval", async () => {
     jest.useFakeTimers();
 
-    (fetch as jest.Mock).mockResolvedValue({
+    (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
     });
@@ -74,7 +76,9 @@ describe("useBTCPrice", () => {
 
     jest.advanceTimersByTime(10000);
 
-    expect(fetch).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
 
     jest.useRealTimers();
   });
@@ -90,5 +94,23 @@ describe("useBTCPrice", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
 
     jest.useRealTimers();
+  });
+
+  it("should handle invalid JSON response gracefully", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => {
+        throw new Error("Invalid JSON");
+      },
+    });
+
+    const { result } = renderHook(() => useBTCPrice());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe("Invalid JSON");
+    });
+
+    expect(result.current.price).toBe(null);
+    expect(result.current.loading).toBe(false);
   });
 });
